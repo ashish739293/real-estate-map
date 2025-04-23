@@ -21,7 +21,7 @@ export default function CityPage() {
     dispatch(setLoading(true));
     fetch(`/api/scrape?city=${encodeURIComponent(cityName)}`)
       .then((r) => r.json())
-      .then((data) => dispatch(setProjects(data)));
+      .then((data) => dispatch(setProjects(data?.projects)));
   }, [cityName, dispatch]);
 
   const handleClick = async (proj) => {
@@ -40,6 +40,8 @@ export default function CityPage() {
     }
   };
 
+  console.log("<><><><>",list);
+
   return (
     <div className="p-6 md:p-10 grid grid-cols-1 md:grid-cols-2 gap-6">
       {/* Header with Home button */}
@@ -53,30 +55,30 @@ export default function CityPage() {
         </Link>
       </div>
 
-      {/* Projects list */}
-      <div className="overflow-y-auto max-h-[75vh] space-y-4 pr-2">
-        {loading ? (
-          <Spinner />
-        ) : (
-          list.map((p, i) => (
-            <div
-              key={i}
-              onClick={() => handleClick(p)}
-              className="cursor-pointer transform hover:scale-105 transition"
-            >
-              <ProjectCard project={p} />
-            </div>
-          ))
-        )}
-        {geoLoading && (
-          <p className="text-blue-600 text-center mt-2">Locating…</p>
-        )}
-      </div>
+       {/* Projects list */}
+  <div className="overflow-y-auto max-h-[75vh] space-y-4 pr-2">
+    {loading ? (
+      <Spinner />
+    ) : list.length > 0 ? (
+      list.map((proj, idx) => (
+        <div
+          key={idx}
+          onClick={() => handleClick(proj)}
+          className="cursor-pointer transform hover:scale-105 transition"
+        >
+          <ProjectCard project={proj} />
+        </div>
+      ))
+    ) : (
+      <p className="text-center text-gray-500">No projects found.</p>
+    )}
+    {geoLoading && <p className="text-blue-600 text-center mt-2">Locating…</p>}
+  </div>
 
-      {/* Map view */}
-      <div className="h-[75vh] rounded-lg overflow-hidden">
-        <MapView selected={selected} />
-      </div>
-    </div>
+  {/* Map view */}
+  <div className="h-[75vh] rounded-lg overflow-hidden">
+    <MapView selected={selected} />
+  </div>
+</div>
   );
 }
